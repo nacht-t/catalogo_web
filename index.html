@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GMEXPRESS — Food Service</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      font-family:"Source Sans 3",sans-serif;
+      background:#fff;
+      color:#1a1a1a;
+      line-height:1.6;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================= */
+
+    .navbar{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:1rem 2rem;
+      background:#fff;
+      border-bottom:1px solid #f0f0f0;
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+
+    .navbar-brand{
+      display:flex;
+      align-items:center;
+      gap:1.2rem;
+      text-decoration:none;
+    }
+
+    .navbar-logo{
+      height:45px;
+      width:auto;
+      object-fit:contain;
+    }
+
+    .navbar-brand-circle{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      background:linear-gradient(135deg,#1d3f8f,#46a834);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:1.1rem;
+    }
+
+    .navbar-brand-text-main{
+      color:#1d3f8f;
+      font-weight:700;
+      font-size:1.2rem;
+      line-height:1;
+    }
+
+    .navbar-brand-text-sub{
+      color:#46a834;
+      font-size:.7rem;
+      letter-spacing:.5px;
+      font-weight:600;
+    }
+
+    .navbar-menu{
+      display:flex;
+      gap:2rem;
+    }
+
+    .navbar-menu a{
+      text-decoration:none;
+      color:#333;
+      font-weight:600;
+      transition:.2s;
+    }
+
+    .navbar-menu a:hover{
+      color:#46a834;
+    }
+
+    .btn-pedido{
+      border:none;
+      background:#1d3f8f;
+      color:#fff;
+      padding:.8rem 1.4rem;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s;
+    }
+
+    .btn-pedido:hover{
+      background:#163170;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero{
+      max-width:1200px;
+      margin:auto;
+      padding:4rem 2rem;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      align-items:center;
+      gap:4rem;
+    }
+
+    .hero-content{
+      display:flex;
+      flex-direction:column;
+      gap:1.5rem;
+    }
+
+    .hero-badge{
+      width:fit-content;
+      padding:.55rem 1rem;
+      border-radius:999px;
+      background:#edf8ea;
+      color:#46a834;
+      font-weight:700;
+      font-size:.85rem;
+      letter-spacing:.3px;
+    }
+
+    .hero-title{
+      font-size:3rem;
+      line-height:1.1;
+      font-weight:700;
+    }
+
+    .hero-title-accent{
+      color:#46a834;
+    }
+
+    .hero-description{
+      color:#5f5f5f;
+      font-size:1rem;
+      max-width:550px;
+    }
+
+    .hero-buttons{
+      display:flex;
+      gap:1rem;
+      margin-top:.5rem;
+      justify-content: center;
+    }
+
+    .btn-primary{
+      text-decoration:none;
+      background:#46a834;
+      color:#fff;
+      padding:1rem 1.7rem;
+      border-radius:12px;
+      font-weight:700;
+      transition:.25s;
+    }
+
+    .btn-primary:hover{
+      background:#3b8f2d;
+      transform:translateY(-2px);
+    }
+
+    .btn-secondary{
+      text-decoration:none;
+      border:2px solid #1d3f8f;
+      color:#1d3f8f;
+      padding:1rem 1.7rem;
+      border-radius:12px;
+      font-weight:700;
+      transition:.25s;
+    }
+
+    .btn-secondary:hover{
+      background:#1d3f8f;
+      color:#fff;
+    }
+
+    /* =========================
+       IMAGE
+    ========================= */
+
+    .hero-image-wrap{
+      position:relative;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .hero-image-bg{
+      position:absolute;
+      inset:20px;
+      background:linear-gradient(135deg,#eef8ff,#edf8ea);
+      border-radius:28px;
+      filter:blur(10px);
+      opacity:.9;
+      z-index:-1;
+    }
+
+    .hero-image{
+      width:100%;
+      max-width:540px;
+      border-radius:24px;
+      display:block;
+      object-fit:cover;
+
+      box-shadow:
+        0 25px 50px rgba(0,0,0,.10),
+        0 10px 20px rgba(0,0,0,.06);
+    }
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .stats-wrapper{
+      max-width:1200px;
+      margin:auto;
+      padding:0 2rem 4rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:4rem;
+      align-items:flex-start;
+      border-top:1px solid #ececec;
+      padding-top:2.5rem;
+    }
+
+    .stat-card{
+      display:flex;
+      flex-direction:column;
+      gap:.2rem;
+    }
+
+    .stat-icon{
+      font-size:1.2rem;
+      margin-bottom:.3rem;
+    }
+
+    .stat-number{
+      font-size:2.3rem;
+      font-weight:700;
+      line-height:1;
+      color:#1a1a1a;
+    }
+
+    .stat-label{
+      color:#6b6b6b;
+      font-size:.95rem;
+      font-weight:500;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:900px){
+
+      .hero{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+
+      .hero-content{
+        align-items:center;
+      }
+
+      .hero-description{
+        max-width:100%;
+      }
+
+      .stats{
+        justify-content:center;
+        flex-wrap:wrap;
+      }
+
+      .navbar-menu{
+        display:none;
+      }
+    }
+
+    @media(max-width:600px){
+
+      .hero{
+        padding:2.5rem 1.2rem;
+      }
+
+      .hero-title{
+        font-size:2.1rem;
+      }
+
+      .hero-buttons{
+        width:100%;
+        flex-direction:column;
+      }
+
+      .btn-primary,
+      .btn-secondary{
+        width:100%;
+      }
+
+      .stats{
+        gap:2rem;
+      }
+
+      .stat-number{
+        font-size:1.8rem;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+
+  <nav class="navbar">
+
+    <a href="index.html" class="navbar-brand">
+
+      <img src="Logo-horizontal.png" alt="GMEXPRESS Logo" class="navbar-logo" />
+    </a>
+
+  </nav>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <div class="hero-badge">
+        DISTRIBUCIÓN FOOD SERVICE
+      </div>
+
+      <h1 class="hero-title">
+        Soluciones
+        <span class="hero-title-accent">Food Service</span>
+        a tu medida
+      </h1>
+
+      <p class="hero-description">
+        Abastecimiento rápido y confiable de snacks, bebidas, cafetería y productos de consumo rápido para empresas, casinos y puntos de venta.
+      </p>
+
+      <div class="hero-buttons">
+
+        <a href="Catalogo.html" class="btn-primary">
+          Ver catálogo 
+        </a>
+      </div>
+
+    </div>
+
+    <div class="hero-image-wrap">
+
+      <div class="hero-image-bg"></div>
+
+      <img
+        src="foto_home.png"
+        alt="Productos GMEXPRESS"
+        class="hero-image"
+      />
+
+    </div>
+
+  </section>
+
+  <!-- STATS -->
+
+  <div class="stats-wrapper">
+
+    <section class="stats">
+
+      <div class="stat-card">
+        <div class="stat-number">80+</div>
+        <div class="stat-label">Productos</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Despacho</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Confianza</div>
+      </div>
+
+    </section>
+
+  </div>
+
+</body>
+</html>
