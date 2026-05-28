@@ -257,7 +257,7 @@ function normalizeProduct(row) {
   const categoria = row.Categoría ?? row["Categoría"] ?? row.Categoria ?? "";
   const descripcion = row.Descripción ?? row["Descripción"] ?? row.Descripcion ?? "";
   const precioRaw = row.Precio ?? row.precio ?? "0";
-  const stockRaw = row["Stock"] ?? row["Stock "] ?? row.Stock ?? "0";
+  const stockRaw = row["Stock"] ?? row["Stock "] ?? row.Stock ?? row["10"] ?? "0";
   const imagen = row.Imagen ?? row.imagen ?? "";
 
   const precio = Number(String(precioRaw).replace(/\s/g, "").replace(",", ".")) || 0;
