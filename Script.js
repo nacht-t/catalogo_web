@@ -636,6 +636,46 @@ function buildWhatsAppPrefillText() {
   return `${body.slice(0, max - 40)}\n...(texto recortado por largo)`;
 }
 
+function showSuccessModal() {
+  const modal = document.getElementById("success-modal");
+  if (!modal) return;
+  modal.hidden = false;
+}
+
+function closeSuccessModal() {
+  const modal = document.getElementById("success-modal");
+  if (!modal) return;
+  modal.hidden = true;
+}
+
+function wireSuccessModal() {
+  const modal = document.getElementById("success-modal");
+  const closeBtn = document.getElementById("success-modal-close");
+  
+  if (!modal || !closeBtn) return;
+  
+  closeBtn.addEventListener("click", () => closeSuccessModal());
+  
+  // Cerrar al hacer clic afuera del contenido
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeSuccessModal();
+  });
+}
+
+function getProductPrice(key) {
+  const p = findProductByRequestKey(key);
+  return p ? p.precio : 0;
+}
+
+function calculateRequestTotal() {
+  let total = 0;
+  requestLines.forEach((line, key) => {
+    const precio = getProductPrice(key);
+    total += precio * line.cantidad;
+  });
+  return total;
+}
+
 function renderRequestLines() {
   const wrap = document.getElementById("request-lines-wrap");
   if (!wrap) return;
@@ -654,19 +694,23 @@ function renderRequestLines() {
   const table = el("div", "request-table", { role: "table", "aria-label": "Productos en la solicitud" });
   const head = el("div", "request-table__row request-table__row--head");
   head.appendChild(el("span", "request-table__cell", { text: "Producto" }));
-  head.appendChild(el("span", "request-table__cell request-table__cell--sku", { text: "SKU" }));
   head.appendChild(el("span", "request-table__cell request-table__cell--qty", { text: "Cantidad" }));
-  head.appendChild(el("span", "request-table__cell request-table__cell--act", { text: "" }));
+  head.appendChild(el("span", "request-table__cell request-table__cell--price", { text: "Precio" }));
+  head.appendChild(el("span", "request-table__cell request-table__cell--subtotal", { text: "Subtotal" }));
   table.appendChild(head);
 
   const sorted = Array.from(requestLines.entries()).sort((a, b) =>
     (a[1].nombre || "").localeCompare(b[1].nombre || "", "es"),
   );
 
+  let totalPrice = 0;
   sorted.forEach(([key, line]) => {
+    const precio = getProductPrice(key);
+    const subtotal = precio * line.cantidad;
+    totalPrice += subtotal;
+
     const row = el("div", "request-table__row");
     row.appendChild(el("span", "request-table__cell request-table__cell--name", { text: line.nombre }));
-    row.appendChild(el("span", "request-table__cell request-table__cell--sku", { text: line.sku }));
 
     const qtyCell = el("div", "request-table__cell request-table__cell--qty");
     const qWrap = el("div", "product-actions__qty product-actions__qty--table");
@@ -693,19 +737,20 @@ function renderRequestLines() {
       updateRequestLineKey(key, Number(input.value));
     });
 
-    const act = el("div", "request-table__cell request-table__cell--act");
-    const del = el("button", "btn-remove-line", { type: "button", text: "Quitar", "aria-label": `Quitar ${line.nombre}` });
-    del.addEventListener("click", () => {
-      requestLines.delete(key);
-      updateRequestFab();
-      renderRequestLines();
-    });
-    act.appendChild(del);
-
     row.appendChild(qtyCell);
-    row.appendChild(act);
+    row.appendChild(el("span", "request-table__cell request-table__cell--price", { text: priceText({ precio }) }));
+    row.appendChild(el("span", "request-table__cell request-table__cell--subtotal", { text: money.format(subtotal) }));
+
     table.appendChild(row);
   });
+
+  // Agregar fila de total
+  const totalRow = el("div", "request-table__row request-table__row--total");
+  totalRow.appendChild(el("span", "request-table__cell", { text: "" }));
+  totalRow.appendChild(el("span", "request-table__cell", { text: "" }));
+  totalRow.appendChild(el("span", "request-table__cell request-table__cell--total-label", { text: "TOTAL:" }));
+  totalRow.appendChild(el("span", "request-table__cell request-table__cell--total-price", { text: money.format(totalPrice) }));
+  table.appendChild(totalRow);
 
   wrap.appendChild(table);
   syncPickerInputsFromRequestLines();
@@ -811,9 +856,8 @@ async function handleRequestSubmit(submitBtn) {
     renderRequestCategoryPicker();
     renderRequestLines();
 
-    flashRequestFeedback(
-      "Solicitud enviada correctamente. Nos pondremos en contacto con usted.",
-    );
+    showSuccessModal();
+    closeRequestDrawer();
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     flashRequestFeedback(msg, msg.length > 160 ? 14000 : 3200);
@@ -1297,3 +1341,4 @@ document.getElementById("csv-file").addEventListener("change", async (ev) => {
 
 loadCatalog();
 wireRequestDrawer();
+wireSuccessModal();
