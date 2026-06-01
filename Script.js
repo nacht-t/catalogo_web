@@ -78,24 +78,51 @@ async function sendCallMeBotWhatsapp(text) {
   url.searchParams.set("text", text);
   url.searchParams.set("apikey", cfg.apikey);
 
-  await fetch(url.toString(), {
-    method: "GET",
-    mode: "no-cors",
-    cache: "no-store",
-  });
+  try {
+    const resp = await fetch(url.toString(), {
+      method: "GET",
+      mode: "cors",
+      cache: "no-store",
+    });
+    if (!resp.ok && resp.status !== 0) {
+      throw new Error(`CallMeBot error: ${resp.status} ${resp.statusText}`);
+    }
+  } catch (err) {
+    // Log error pero no falla todo el pedido
+    console.error("WhatsApp send error:", err);
+    // Opcionalmente lanzar error si prefieres que falle:
+    // throw new Error(`No se pudo enviar WhatsApp: ${err.message}`);
+  }
 }
 
 async function fetchGasOrderWebApp(url, payload) {
   const bodyJson = JSON.stringify(payload);
 
-  await fetch(url, {
+  const resp = await fetch(url, {
     method: "POST",
-    mode: "no-cors",
+    mode: "cors",
     credentials: "omit",
     cache: "no-store",
     body: bodyJson,
-    headers: { "Content-Type": "text/plain" },
+    headers: { "Content-Type": "application/json" },
   });
+
+  // Intentar leer respuesta
+  let responseText = "";
+  try {
+    responseText = await resp.text();
+  } catch (e) {
+    // Si no se puede leer, hacer una suposición basada en status
+    if (!resp.ok) {
+      throw new Error(`Google Apps Script error: ${resp.status} ${resp.statusText}`);
+    }
+    return { ok: true };
+  }
+
+  // Si la respuesta contiene "error" o no está OK
+  if (!resp.ok || responseText.toLowerCase().includes("error")) {
+    throw new Error(`Error del servidor: ${responseText || resp.statusText}`);
+  }
 
   return { ok: true };
 }
@@ -787,15 +814,20 @@ async function handleRequestSubmit(submitBtn) {
   submitBtn.textContent = "Enviando…";
 
   try {
-    const whatsappPrefill = buildWhatsAppPrefillText();
+    // 1. PRIMERO: Enviar a Google Apps Script y esperar confirmación
     await fetchGasOrderWebApp(url, payload);
-    await sendCallMeBotWhatsapp(whatsappPrefill);
+    
+    // 2. LUEGO: Solo si Google Apps Script confirmó, actualizar stock localmente
     applyLocalStockAfterOrder();
     clearRequestFormAndLines();
     updateRequestFab();
     renderGrid();
     renderRequestCategoryPicker();
     renderRequestLines();
+    
+    // 3. FINALMENTE: Enviar WhatsApp (no falla si hay error)
+    const whatsappPrefill = buildWhatsAppPrefillText();
+    await sendCallMeBotWhatsapp(whatsappPrefill);
 
     showSuccessModal();
     closeRequestDrawer();
