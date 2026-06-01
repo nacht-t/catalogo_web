@@ -85,78 +85,19 @@ async function sendCallMeBotWhatsapp(text) {
   });
 }
 
-/**
- * Envío compatible con Web Apps de Google Apps Script (CORS / redirecciones).
- * Primero application/x-www-form-urlencoded (evita preflight); si falla la red, reintenta con text/plain.
- */
 async function fetchGasOrderWebApp(url, payload) {
   const bodyJson = JSON.stringify(payload);
-  const common = {
+
+  await fetch(url, {
     method: "POST",
-    mode: "cors",
+    mode: "no-cors",
     credentials: "omit",
     cache: "no-store",
-    redirect: "follow",
-  };
+    body: bodyJson,
+    headers: { "Content-Type": "text/plain" },
+  });
 
-  /* Primero JSON en cuerpo text/plain (Apps Script suele leerlo con JSON.parse(postData.contents)).
-   * Respaldo: x-www-form-urlencoded con campo "payload" (ver parsePostJson_ en PedidosWebApp.gs). */
-  let res;
-  try {
-    res = await fetch(url, {
-      ...common,
-      body: bodyJson,
-      headers: { "Content-Type": "text/plain" },
-    });
-  } catch (firstErr) {
-    try {
-      const form = new URLSearchParams();
-      form.set("payload", bodyJson);
-      res = await fetch(url, {
-        ...common,
-        body: form.toString(),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-    } catch {
-      const origin =
-        typeof window !== "undefined" && window.location ? window.location.origin : "";
-      const hint =
-        "No se pudo conectar con Google (failed to fetch).\n\n" +
-        "• Comprobá Internet, VPN o extensiones (bloqueadores).\n" +
-        "• En Apps Script: Desplegar → Nueva implementación → Aplicación web → Acceso: Cualquier persona. Copiá la URL que termina en /exec.\n" +
-        "• Volvé a pegar esa URL en pedidos-url.js y guardá.\n" +
-        (origin.startsWith("http://127.0.0.1") || origin.startsWith("http://localhost")
-          ? "• Servidor local " + origin + " está bien; el Web App debe ser https://script.google.com/…\n"
-          : "");
-      throw new Error(hint);
-    }
-  }
-
-  const raw = await res.text();
-  const trimmed = raw.trimStart();
-  if (trimmed.startsWith("<!") || trimmed.toLowerCase().startsWith("<html")) {
-    throw new Error(
-      "Google devolvió una página HTML (suele ser permisos o sesión). Revisá que el Web App esté como “Cualquier persona” y que la URL sea la de Desplegar (/exec), no la del editor.",
-    );
-  }
-
-  let data = null;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    /* ignorar */
-  }
-  if (!data || typeof data !== "object") {
-    throw new Error(
-      res.ok
-        ? "El servidor no devolvió JSON válido. Revisá el código y volvé a desplegar PedidosWebApp.gs."
-        : `Error del servidor (HTTP ${res.status}).`,
-    );
-  }
-  if (!data.ok) {
-    throw new Error(data.error || "No se pudo registrar el pedido.");
-  }
-  return data;
+  return { ok: true };
 }
 
 /**
