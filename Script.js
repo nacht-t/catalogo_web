@@ -106,8 +106,8 @@ async function fetchGasOrderWebApp(url, payload) {
  */
 const ORDERS_SUBMIT_SECRET = "";
 
-/** WhatsApp del negocio para wa.me (solo dígitos, sin +). Ej. +56 9 71677366 → 56971677366 */
-const ORDERS_WHATSAPP_WA_ME = "56971677366";
+/** WhatsApp del negocio para wa.me (solo dígitos, sin +). Ej. +56 9 4785 4598 → 56947854598 */
+const ORDERS_WHATSAPP_WA_ME = "56947854598";
 
 /** Líneas de solicitud: sku → { nombre, sku, cantidad }. */
 const requestLines = new Map();
