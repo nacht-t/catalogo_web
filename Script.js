@@ -98,33 +98,21 @@ async function sendCallMeBotWhatsapp(text) {
 async function fetchGasOrderWebApp(url, payload) {
   const bodyJson = JSON.stringify(payload);
 
-  const resp = await fetch(url, {
-    method: "POST",
-    mode: "cors",
-    credentials: "omit",
-    cache: "no-store",
-    body: bodyJson,
-    headers: { "Content-Type": "application/json" },
-  });
-
-  // Intentar leer respuesta
-  let responseText = "";
   try {
-    responseText = await resp.text();
-  } catch (e) {
-    // Si no se puede leer, hacer una suposición basada en status
-    if (!resp.ok) {
-      throw new Error(`Google Apps Script error: ${resp.status} ${resp.statusText}`);
-    }
+    const resp = await fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      credentials: "omit",
+      cache: "no-store",
+      body: bodyJson,
+      headers: { "Content-Type": "text/plain" },
+    });
+
+    // Con no-cors no podemos leer la respuesta, pero si llega sin error está bien
     return { ok: true };
+  } catch (err) {
+    throw new Error(`No se pudo conectar con el servidor: ${err.message}`);
   }
-
-  // Si la respuesta contiene "error" o no está OK
-  if (!resp.ok || responseText.toLowerCase().includes("error")) {
-    throw new Error(`Error del servidor: ${responseText || resp.statusText}`);
-  }
-
-  return { ok: true };
 }
 
 /**
